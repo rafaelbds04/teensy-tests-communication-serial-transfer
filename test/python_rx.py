@@ -1,5 +1,6 @@
 from time import sleep, time
 from pySerialTransfer import pySerialTransfer as txfer
+from datetime import datetime
 
 # a,b,c,d,e,f,g,h,i,j,k,l,m,n = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 # all = (a,b,c,d,e,f,g,h,i,j,k,l,m,n)
@@ -10,48 +11,36 @@ nextUpdate = time()
 
 if __name__ == '__main__':
     try:
-        link = txfer.SerialTransfer('COM9')
+        link = txfer.SerialTransfer('COM4', baud=20000000)
 
         link.open()
         sleep(1)
         while True:
             if link.available():
+
+                if counter == 0:
+                    timein = datetime.now().microsecond
+
                 recSize = 0
-                datagram_ID = link.rx_obj(obj_type='B', start_pos=recSize)
-                print(type(datagram_ID))
-                recSize += txfer.STRUCT_FORMAT_LENGTHS['B']
-                print(txfer.STRUCT_FORMAT_LENGTHS['B'])
 
-                timestamp = link.rx_obj(obj_type='L', start_pos=recSize)
-                print(type(timestamp))
-                recSize += txfer.STRUCT_FORMAT_LENGTHS['L']
-                print(txfer.STRUCT_FORMAT_LENGTHS['L'])
+                for i in range(28):
+                    datagram_ID = link.rx_obj(obj_type='B', start_pos=recSize)
+                    recSize += txfer.STRUCT_FORMAT_LENGTHS['B']
 
-                value = link.rx_obj(obj_type='f', start_pos=recSize)
-                print(type(value))
-                recSize += txfer.STRUCT_FORMAT_LENGTHS['f']
-                print(txfer.STRUCT_FORMAT_LENGTHS['f'])
+                    timestamp = link.rx_obj(obj_type='L', start_pos=recSize)
+                    recSize += txfer.STRUCT_FORMAT_LENGTHS['L']
+
+                    value = link.rx_obj(obj_type='f', start_pos=recSize)
+                    recSize += txfer.STRUCT_FORMAT_LENGTHS['f']
+                    # print('{} - {} - {}'.format(datagram_ID, timestamp, value))
+
+                counter += 1
+
+                if(counter == 38):
+                    print(datetime.now().microsecond - timein)
+                    counter = 0
+                    # break
                 
-                print('{} - {} - {}'.format(datagram_ID, timestamp, value))
-                
-                datagram_ID = link.rx_obj(obj_type='B', start_pos=recSize)
-                print(type(datagram_ID))
-                recSize += txfer.STRUCT_FORMAT_LENGTHS['B']
-                print(txfer.STRUCT_FORMAT_LENGTHS['B'])
-
-                timestamp = link.rx_obj(obj_type='L', start_pos=recSize)
-                print(type(timestamp))
-                recSize += txfer.STRUCT_FORMAT_LENGTHS['L']
-                print(txfer.STRUCT_FORMAT_LENGTHS['L'])
-
-                value = link.rx_obj(obj_type='f', start_pos=recSize)
-                print(type(value))
-                recSize += txfer.STRUCT_FORMAT_LENGTHS['f']
-                print(txfer.STRUCT_FORMAT_LENGTHS['f'])
-
-
-
-                print('{} - {} - {}'.format(datagram_ID, timestamp, value))
                 # bufferSize - 1
 
                 # c = link.rx_obj(obj_type='f', start_pos=recSize)
