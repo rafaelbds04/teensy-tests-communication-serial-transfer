@@ -19,17 +19,17 @@ timestamp, datagram_ID, value = 0, 0, 0
 counter = 0
 nextUpdate = time()
 
-def getObjTypeAndVirtualPadding(datagram_ID):
+def getObjType(datagram_ID):
     "Get object type and size from Datagram ID range"
 
     if datagram_ID > 0 and datagram_ID < 15:   # uint8_t
-        return 'B', pySerial.STRUCT_FORMAT_LENGTHS['B'] + 3
+        return 'B'
     elif datagram_ID > 14 and datagram_ID < 25:  # uint32_t
-        return 'L', pySerial.STRUCT_FORMAT_LENGTHS['L']
+        return 'L'
     elif datagram_ID > 24 and datagram_ID < 45:  # float
-        return 'f', pySerial.STRUCT_FORMAT_LENGTHS['f']
+        return 'f'
     else:
-        return 'f', 4
+        return 'f'
          
 if __name__ == '__main__':
     try:
@@ -64,11 +64,11 @@ if __name__ == '__main__':
                     recSize += pySerial.STRUCT_FORMAT_LENGTHS['L']
                     print(timestamp)
 
-                    obj, padding = getObjTypeAndVirtualPadding(datagram_ID)
-                    value = link.rx_obj(obj_type= obj, start_pos=recSize)
-                    recSize += padding
+                    obj = getObjType(datagram_ID)
+                    value = link.rx_obj(obj_type=obj, start_pos=recSize)
+                    recSize += 4
+                    
                     print(obj)
-                    print(padding-4)
                     print(value)
                     print()
 
